@@ -1,7 +1,11 @@
 package jp.co.metateam.library.controller;
 
+import java.util.ArrayList;
 import java.util.List;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+ 
+import org.hibernate.collection.spi.PersistentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
+import jp.co.metateam.library.model.Account;
+import jp.co.metateam.library.model.AccountDto;
 import jp.co.metateam.library.model.BookMst;
 import jp.co.metateam.library.model.BookMstDto;
 import jp.co.metateam.library.service.BookMstService;
@@ -23,22 +29,138 @@ import lombok.extern.log4j.Log4j2;
  */
 @Log4j2
 @Controller
-public class BookController {
+// public class BookController {
     
+//     private final BookMstService bookMstService;
+
+//     @Autowired
+//     public BookController(BookMstService bookMstService){
+//         this.bookMstService = bookMstService;
+//     }
+
+//        @GetMapping("/book/index")
+//        public String index(Model model) {
+//         // 書籍を全件取得
+//         List<BookMstDto> bookMstList = this.bookMstService.findAvailableWithStockCount();
+       
+//         model.addAttribute("bookMstList", bookMstList);
+ 
+//         return "book/index";
+//         }
+ 
+//     @GetMapping("/book/add")
+//     public String add(Model model) {
+       
+       
+//         if (!model.containsAttribute("bookMstDto")) {
+//             model.addAttribute("bookMstDto", new BookMstDto());
+//         }
+//         return"book/add";
+//     }
+
+//         @PostMapping("book/add")
+//         public String addbook(@Valid @ModelAttribute BookMstDto bookMstDto, BindingResult result, RedirectAttributes ra,Model model) {
+//             String title = bookMstDto.getTitle();
+//             String isbn = bookMstDto.getIsbn();
+     
+//                 boolean errIsbncharatype = false;
+//                 boolean errTitleFlg = false;
+//                 boolean errIsbnFlg = false;
+//                 boolean errIsbnnullFlg  = false;
+//                 boolean errIsbncharaCount = false;
+       
+//             List<String> errTitleList = new ArrayList<>();
+//             List<String> errisbnList = new ArrayList<>();
+//        List<String> errIsbnList = new ArrayList<>();
+           
+//         //     // 書籍名のバリデーション
+//         //    // if (title == ""||title ==null) {
+//         //       //  errTitleList.add("書籍名は必須です。");
+//         //        // errTitleFlg = true;        
+//         //    // }
+
+//             if (bookMstDto.getTitle() == null || bookMstDto.getTitle().trim().isEmpty()) {
+//                 errTitleList.add("書籍名は必須です。");
+//                 result.rejectValue("title", "error.required", "書籍名は必須です");
+//                 errTitleFlg = true;
+//             }
+         
+//         //     // 書籍名が256文字以上の場合、エラーフラグを立てる
+//            // if (bookMstDto.getTitle().length() >= 256) {
+//             //    errTitleList.add("書籍名は256文字以内で入力してください");
+//             //     errTitleFlg = true;
+//             // }
+            
+//             if (bookMstDto.getTitle().length() > 256) {
+//                 errTitleList.add("書籍名は256文字以内で入力してください");
+//                 result.rejectValue("title", "error.maxlength", "書籍名は256文字以内で入力してください");
+//                 errTitleFlg = true;
+//             }
+//         //     // ISBNのバリデーション
+//             if (bookMstDto.getIsbn() == null || bookMstDto.getIsbn().trim().isEmpty()) {
+//                 errIsbnList.add("ISBNは必須です");
+//                 result.rejectValue("isbn", "error.required", "ISBNは必須です");
+//                 errIsbnFlg = true;
+//             }
+         
+//         //     // ISBNが13文字以外の場合、エラーフラグを立てる
+//             if (bookMstDto.getIsbn().length() != 13) {
+//                 errIsbnList.add("ISBNは13桁で入力してください");
+//                 result.rejectValue("isbn", "error.length", "ISBNは13桁で入力してください");
+//                 errIsbnFlg = true;
+//             }
+         
+//         //     // ISBNが数字のみで構成されていることを確認する正規表現
+//             if (!bookMstDto.getIsbn().matches("[0-9]+")) {
+//                 errIsbnList.add("ISBNは半角数字で入力してください");
+//                 result.rejectValue("isbn", "error.format", "ISBNは半角数字で入力してください");
+//                 errIsbnFlg = true;
+        
+//             }
+         
+            
+         
+//         //     // エラーがあれば、エラーメッセージリストをフラッシュ属性に渡す
+//             if(errIsbnFlg || errIsbnnullFlg || errIsbncharaCount || errIsbncharatype){
+//                 model.addAttribute( "errtitle",errTitleList);
+//                 // model.addAttribute( "errisbn",errIsbnList);
+//               return"book/add";
+//              }
+
+//         //     // もしISBNがすでに存在している場合、エラーを返す
+//              if(!bookMstService.isbnDuplicateCheck(isbn)){
+//                 model.addAttribute("errisbn","登録済みのISBNです");
+//                   //return "book/add";
+//         //       }
+//         //    // エラーがある場合、フォーム画面にリダイレクト
+            
+         
+//         //     // バリデーションにエラーがなければ、書籍データを保存
+//                  if (result.hasErrors()) {
+//                     return "book/add";
+//                      }
+           
+//         bookMstService.save(bookMstDto);
+         
+//             // 登録成功メッセージを設定して、一覧画面にリダイレクト
+//            model.addAttribute("message", "書籍が正常に登録されました");
+//             return "redirect:/book/index";    
+        
+//     }
+// } 
+public class BookController {
+
     private final BookMstService bookMstService;
 
     @Autowired
-    public BookController(BookMstService bookMstService){
+    public BookController(BookMstService bookMstService) {
         this.bookMstService = bookMstService;
     }
 
     @GetMapping("/book/index")
     public String index(Model model) {
-        // 書籍を全件取得
         List<BookMstDto> bookMstList = this.bookMstService.findAvailableWithStockCount();
-        
         model.addAttribute("bookMstList", bookMstList);
-
         return "book/index";
     }
 
@@ -47,8 +169,65 @@ public class BookController {
         if (!model.containsAttribute("bookMstDto")) {
             model.addAttribute("bookMstDto", new BookMstDto());
         }
-
         return "book/add";
     }
-    
+
+    @PostMapping("/book/add")
+    public String addBook(@Valid @ModelAttribute BookMstDto bookMstDto, BindingResult result, RedirectAttributes ra, Model model) {
+        String title = bookMstDto.getTitle();
+        String isbn = bookMstDto.getIsbn();
+
+        List<String> errTitleList = new ArrayList<>();
+        List<String> errIsbnList = new ArrayList<>();
+
+        // 書籍名のバリデーション
+        if (bookMstDto.getTitle() == null || bookMstDto.getTitle().trim().isEmpty()) {
+            errTitleList.add("書籍名は必須です。");
+            result.rejectValue("title", "error.required", "書籍名は必須です");
+        } else if (bookMstDto.getTitle().length() > 256) {
+            errTitleList.add("書籍名は256文字以内で入力してください");
+            result.rejectValue("title", "error.maxlength", "書籍名は256文字以内で入力してください");
+        }
+
+        // ISBNのバリデーション
+        // if (bookMstDto.getIsbn() == null || bookMstDto.getIsbn().trim().isEmpty()) {
+        //     errIsbnList.add("ISBNは必須です");
+        //     result.rejectValue("isbn", "error.required", "ISBNは必須です");
+        // } else if (bookMstDto.getIsbn().length() != 13) {
+        //     errIsbnList.add("ISBNは13桁で入力してください");
+        //     result.rejectValue("isbn", "error.length", "ISBNは13桁で入力してください");
+        // } else if (!bookMstDto.getIsbn().matches("[0-9]+")) {
+        //     errIsbnList.add("ISBNは半角数字で入力してください");
+        //     result.rejectValue("isbn", "error.format", "ISBNは半角数字で入力してください");
+        // } else if (!bookMstService.isbnDuplicateCheck(isbn)) {
+        //     result.rejectValue("isbn", "error.duplicate", "登録済みのISBNです");
+        // } 
+        if (isbn == null || isbn.trim().isEmpty()) {
+            errIsbnList.add("ISBNは必須です");
+            result.rejectValue("isbn", "error.required", "ISBNは必須です");
+        } else if (!isbn.matches("[0-9]+")) {
+        // 半角数字でない場合
+            errIsbnList.add("ISBNは半角数字で入力してください");
+            result.rejectValue("isbn", "error.format", "ISBNは半角数字で入力してください");
+        } else if (isbn.length() != 13) {
+         // 半角数字ではあるが13桁でない場合
+            errIsbnList.add("ISBNは13桁で入力してください");
+            result.rejectValue("isbn", "error.length", "ISBNは13桁で入力してください");
+        } else if (bookMstService.isbnDuplicateCheck(isbn)) {
+             result.rejectValue("isbn", "error.duplicate", "登録済みのISBNです");
+        }
+ 
+
+        // エラーがあればフォームに戻す
+        if (result.hasErrors()) {
+            return "book/add";
+        }
+
+        // 書籍データを保存
+        bookMstService.save(bookMstDto);
+
+        // 成功メッセージをリダイレクトで渡す
+        ra.addFlashAttribute("message", "書籍が正常に登録されました");
+        return "redirect:/book/index";
+    }
 }
