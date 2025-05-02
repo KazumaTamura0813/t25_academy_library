@@ -1,6 +1,7 @@
 package jp.co.metateam.library.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +25,31 @@ public class BookMstService {
     public BookMstService(BookMstRepository bookMstRepository){
         this.bookMstRepository = bookMstRepository;
     }
+    public void save(BookMstDto bookMstDto) {
+        try {
+            // AccountDtoからAccountへの変換
+            BookMst bookMst = new BookMst();
+ 
+            bookMst.setTitle(bookMstDto.getTitle());
+            bookMst.setIsbn(bookMstDto.getIsbn());
+ 
+            // データベースへの保存
+            this.bookMstRepository.save(bookMst);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+    public boolean isbnDuplicateCheck(String isbn) {
+        List<BookMstDto> bookMstDtoList = findAvailableWithStockCount(); 
+        for (BookMstDto book : bookMstDtoList) {
+            String bookIsbn = book.getIsbn();
+            if (isbn != null && isbn.equals(bookIsbn)) {
+                return true; // 重複あり
+            }
+        } 
+        return false; // 重複なし
+    }
+
     
     public List<BookMstDto> findAvailableWithStockCount() {
         List<BookMst> books = this.bookMstRepository.findLimitedBook();
